@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  app:
+    platform: "linux/amd64"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_CLIENTVAR: "clientvar"
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    image: t3-app
+    environment:
+      - DATABASE_URL=mysql://root:MyStrongPassword@127.0.0.1:3306/learning-t3-mysql
+
+#https://geshan.com.np/blog/2022/02/mysql-docker-compose/
+  db:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=learning-t3-mysql
+      - MYSQL_ROOT_PASSWORD=MyStrongPassword
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  db:
+    driver: local
